@@ -3,6 +3,7 @@ import { Form, Button,Container, Image } from 'react-bootstrap'
 import Email from '../images/Email.svg'
 import key from '../images/key.svg'
 import send from '../images/Send.svg'
+import GoogleLogin from '../components/GoogleLogin'
 
 import { Link } from 'react-router-dom' 
 
@@ -17,9 +18,7 @@ const Login = () => {
                     <Form.Control    type="email" placeholder="Enter email"/>
                        
           </Form.Group>
-        <Form.Text className="text-muted ">
-      (We'll never share your email with anyone else.)
-         </Form.Text>
+     
 
   <Form.Group controlId="formBasicPassword"  className="d-inline-flex w-100 mt-5 "  >
     <Form.Label  className="align-bottom mr-2"  > <Image src={ key } alt="password-icon"  className="mt-2"  /></Form.Label>
@@ -39,6 +38,8 @@ const Login = () => {
 
 
       </Form>
+
+      {/* <GoogleLogin/> */}
 
 
 

@@ -8,7 +8,7 @@ import { Button, Container, Form,Image } from 'react-bootstrap'
 import Email from '../images/Email.svg'
 import key from '../images/key.svg'
 import person from '../images/person.svg'
-import { Redirect } from "react-router-dom";
+// import { Redirect } from "react-router-dom";
 
 
 
@@ -56,7 +56,7 @@ const ValidatedRegisterForm = () => (
 
     //   return errors;
     // }}
-    //********Using Yum for validation********/
+    //********Using Yup for validation********/
 
     validationSchema={Yup.object().shape({
         firstName: Yup.string()
@@ -86,7 +86,7 @@ const ValidatedRegisterForm = () => (
         <Container fluid className="d-flex justify-content-center mt-5 w-100 " >
         <Form className=" text-center  mt-5 w-75 d-flex flex-column align-items-center  " onSubmit={handleSubmit}>
             <h1> <b>Sign Up</b> </h1>
-            <Form.Group controlId="formBasicName" className="d-inline-flex w-50 mt-5 " >
+            <Form.Group controlId="formBasicName" className="d-inline-flex w-50 mt-4 " >
             <label className="align-bottom mr-2"  htmlFor="email"><Image src={ person } alt="Person-icon" className="mt-2"   /></label>
             <Form.Control
             name="firstName"
@@ -105,8 +105,8 @@ const ValidatedRegisterForm = () => (
             <div className="input-feedback  ml-2">{errors.lastName}</div>
           )}
           </Form.Group>
-          <Form.Group controlId="formBasicEmail" className="d-inline-flex w-50 mt-5 " >
-          <label className="align-bottom mr-2"  htmlFor="email"> <Image src={ Email } alt="Email-icon" className="mt-2"   /></label>
+          <Form.Group controlId="formBasicEmail" className="d-inline-flex w-50 mt-4 " >
+          <label className="align-bottom mr-2"  htmlFor="email"> <Image src={ Email } alt="Email-icon" className="mt-1"   /></label>
           <Form.Control
             name="email"
             type="text"
@@ -121,11 +121,9 @@ const ValidatedRegisterForm = () => (
           )}
          
           </Form.Group>
-          <Form.Text className="text-muted ">
-      (We'll never share your email with anyone else.)
-         </Form.Text>
-          <Form.Group controlId="formBasicpassword" className="d-inline-flex w-50 mt-5 " >
-          <label className="align-bottom mr-2"  htmlFor="email"> <Image src={ key } alt="key-icon" className="mt-2"   /> </label>
+        
+          <Form.Group controlId="formBasicpassword" className="d-inline-flex w-50 mt-4 " >
+          <label className="align-bottom mr-2"  htmlFor="email"> <Image src={ key } alt="key-icon" className="mt-1"   /> </label>
           <Form.Control
             name="password"
             type="password"
@@ -139,7 +137,7 @@ const ValidatedRegisterForm = () => (
             <div className="input-feedback  ml-2">{errors.password}</div>
           )}
           </Form.Group>
-          <Button className="w-25 mt-5 mb-5 "  variant="primary "  type="submit" disabled={isSubmitting}    >
+          <Button className="w-25 mt-4 mb-5 "  variant="primary "  type="submit" disabled={isSubmitting}    >
           Sign Up
           </Button>
         </Form>
