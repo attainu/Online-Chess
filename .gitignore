@@ -23,4 +23,4 @@ yarn-debug.log*
 yarn-error.log*
 
 # client Id
-# src/config.js
+src/config.js
