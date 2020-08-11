@@ -5,7 +5,12 @@ import piecePositions from "../constants/piecePositions";
 import { user1, user2, token1, token2 } from "../config";
 import { columns, rows, getPiece, flipColor, getUIC } from "../boardHelper";
 import axios from "axios";
-import { testMove, createChallenge } from "../lichessApiHelper";
+import {
+  testMove,
+  createChallenge,
+  setCurrentPlayer,
+  getGameState,
+} from "../lichessApiHelper";
 
 class Board extends Component {
   state = {
@@ -19,14 +24,18 @@ class Board extends Component {
 
   componentDidMount() {
     //create a challenge
+    /*
     createChallenge()
       .then((res) => {
+        console.log("challenge", res);
+
         this.setState((prevState) => ({
           ...prevState,
           gameId: res.data.challenge.id,
         }));
       })
       .catch((err) => console.log("error creating challenge", err));
+      */
   }
 
   handleClick = (id, piece) => {
@@ -68,7 +77,7 @@ class Board extends Component {
       testMove(this.state.gameId, start, end, this.state.currentPlayer)
         .then((res) => {
           console.log("moving", startRow, startCol);
-          
+
           const updated = this.state.piecePositions.map((row, i) => {
             //console.log(rows[i], startRow)
             if (rows[i] === startRow) {
@@ -100,18 +109,29 @@ class Board extends Component {
             end: null,
             numClicks: 0,
             piecePositions: updated,
-            currentPlayer: prevState.currentPlayer === 1 ? 2 : 1
+            currentPlayer: prevState.currentPlayer === 1 ? 2 : 1,
           }));
+
+          getGameState(this.state.gameId)
+          .then(res => { 
+            console.log("res", res)
+            const {status, winner} = res.data.state
+            if(status === "mate") {
+              alert(`Checkmate, winner ${winner}`)
+            }
+          
+          })
+          .catch(err => console.log(err))
         })
         .catch((err) => {
-          console.log("Invalid move")
-          this.setState(prevState => ({
+          console.log("Invalid move");
+          this.setState((prevState) => ({
             ...prevState,
             numClicks: 0,
-            start:null,
+            start: null,
             end: null,
-            activePiece: null
-          }))
+            activePiece: null,
+          }));
         });
     }
   };

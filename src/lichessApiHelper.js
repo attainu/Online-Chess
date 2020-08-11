@@ -14,11 +14,28 @@ export const testMove = (gameId, start, end, currentPlayer) => {
   );
 };
 
+export const getGameState = (gameId) => {
+  return axios.get(`https://lichess.org/api/board/game/stream/${gameId}`, {
+    headers: {
+      Authorization: `Bearer ${token1}`,
+    }
+  })
+
+}
+
+export const setCurrentPlayer = () => {  
+  return axios.get(`https://lichess.org/api/account/playing`, {
+    headers: {
+      Authorization: `Bearer ${token1}`,
+    },
+  })
+}
+
 export const createChallenge = () => {
   const data = {
     rated: false,
     days: 1,
-    color: "white",
+    "color": "white",
     variant: "standard",
     acceptByToken: token2,
   };
