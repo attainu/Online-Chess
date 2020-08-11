@@ -1,14 +1,17 @@
 import React from 'react'
-import config from './../config'
+import config from '../config'
 import { Redirect } from 'react-router-dom'
+import { connect } from 'react-redux'
+import GoogleLogin from 'react-google-login';
+import { googleSetUser } from '../redux/actions/googleAuthActions'
 
-const GoogleLogin = ({user,setUser}) => {
+const GoogleLoginPage = ({user,setUser}) => {
     const responseGoogle = response => {
         if(response.error){
             console.error(response.error)
         }
         console.log(response)
-        setUser({...response.profileObj, ...response.tokenObj })
+       
 
     };
     // if(user) return <Redirect to="/" />;
@@ -28,5 +31,12 @@ const GoogleLogin = ({user,setUser}) => {
         </div>
     )
 }
-
-export default GoogleLogin
+const mapStateToProps = storeState => {
+    console.log(storeState.googleAuthState.user)
+  
+    return {
+        user: storeState.googleAuthState.user
+    }
+  }
+  
+ export default connect(mapStateToProps,{ googleSetUser })(GoogleLoginPage)
