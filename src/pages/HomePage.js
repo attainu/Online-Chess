@@ -1,8 +1,5 @@
 import React, { Component } from "react";
 import {
-    Nav,
-    Navbar,
-    NavbarBrand,
     Button,
     Jumbotron,
     Container,
