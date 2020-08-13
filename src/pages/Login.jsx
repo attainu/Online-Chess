@@ -28,7 +28,7 @@ login(e) {
      
     return (
 
-        <Container fluid className="d-flex justify-content-center mt-3 w-100 ">
+        <Container fluid className="d-flex justify-content-center mt-3 w-100 h-100 ">
           {this.props.isAuthenticated? <Redirect to='/Home'/>: ''}
                 <Form onSubmit={(e) => this.login(e)} className=" text-center  mt-5  " >
             <h1> <b>LOGIN</b> </h1>
@@ -59,7 +59,7 @@ login(e) {
  
 
 <GoogleLoginPage/>
-<Link className="d-block align-center mt-5 " to='/Register'>New user? Register now</Link>
+<Link className="d-block align-center mt-3 " to='/Register'>New user? Register now</Link>
 
 
       </Form>

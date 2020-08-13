@@ -25,12 +25,13 @@ const GoogleLoginPage = ({user,googleSetUser}) => {
 
                   <GoogleLogin
     clientId={config.CLIENT_ID}
-    buttonText="Login"
+    buttonText="GOOGLE"
     isSignedIn={false}
     onSuccess={responseGoogle}
     onFailure={responseGoogle}
     scope="https://www.googleapis.com/auth/youtube"
     cookiePolicy={'single_host_origin'}
+    theme="dark"
   />
   
         </div>
