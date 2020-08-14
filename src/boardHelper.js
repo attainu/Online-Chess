@@ -9,10 +9,10 @@ export const getUIC = (id, piece) => {
   };
 
 export const flipColor = (color) => {
-    if (color === "lightblue") {
-      return "#fed8b1";
+    if (color === "#CB8745") {
+      return "#F8C89A";
     } else {
-      return "lightblue";
+      return "#CB8745";
     }
   };
 

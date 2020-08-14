@@ -35,7 +35,7 @@ export const createChallenge = () => {
   const data = {
     rated: false,
     days: 1,
-    "color": "white",
+    color: "white",
     variant: "standard",
     acceptByToken: token2,
   };

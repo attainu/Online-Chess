@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import './App.css'
 import { BrowserRouter, Switch, Route, Redirect} from 'react-router-dom';
 import "bootstrap/dist/css/bootstrap.min.css";
 
@@ -11,6 +12,7 @@ import Header from "./components/Header";
 import Footer from "./components/Footer";
 import GamePage from './pages/GamePage'
 
+
 class App extends Component {
   render(){  
     
@@ -19,7 +21,7 @@ class App extends Component {
         <Header />
         <Switch>
         <Route exact path="/" component={HomePage} />
-        <Route exact path='/game' component={GamePage} />
+        <Route exact path='/game/:gameId' component={GamePage} />
     
       
           <Route path='/Register' exact><ValidatedRegisterForm/></Route>

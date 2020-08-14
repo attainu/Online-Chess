@@ -2,16 +2,19 @@ import React, { Component } from "react";
 import Board from "../components/Board";
 import { Row, Button, Col } from "react-bootstrap";
 import MovesList from "../components/MovesList";
-
+import {connect} from 'react-redux'
+import Chessboard from 'chessboardjsx'
 class GamePage extends Component {
   render() {
     return (
-      <Row className="justify-content-center">
-        <div className="col-auto">
-          <Board />
+      <Row className="justify-content-center py-5" id="jumbotron">
+        <div className="col-auto" style={{border: "5px solid #342104"}}>
+           
+        <Board />
+
         </div>
 
-        <div className="col-auto">
+        <div className="col-auto ml-5">
           <MovesList />
           <Row>
             <Button style={{marginRight: 20}}>Abort</Button>
@@ -23,4 +26,11 @@ class GamePage extends Component {
   }
 }
 
-export default GamePage;
+
+const mapStateToProps = storeState => {
+    console.log("store stet", storeState)
+    return {
+        gameId: storeState.chessState.gameId
+    }
+}
+export default connect(mapStateToProps)(GamePage);

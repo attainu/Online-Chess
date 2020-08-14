@@ -1,22 +1,20 @@
 import React, { Component } from "react";
-
+import Piece from "./Piece";
 class Square extends Component {
   render() {
-      const {id, piece, color, isActive, handleClick} = this.props
+    const { id, piece, color, isActive, handleClick } = this.props;
     return (
-      <div
+      <div className="d-flex justify-content-center align-items-center"
         onClick={() => {
-            handleClick(id, piece)
+          handleClick(id, piece);
         }}
-        style={{ width: 60, height: 60, backgroundColor: isActive ? "yellow" : color }}
+        style={{
+          width: 60,
+          height: 60,
+          backgroundColor: isActive ? "yellow" : color,
+        }}
       >
-        {this.props.piece && (
-          <img
-            style={{ width: 40, height: 40 }}
-            src={piece}
-            alt="piece"
-          />
-        )}
+        {this.props.piece && <Piece piece={piece} />}
       </div>
     );
   }
