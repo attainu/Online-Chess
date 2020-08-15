@@ -1,186 +1,286 @@
-import React, { Component } from "react";
-import { Formik } from "formik";
-import * as Yup from "yup";
-import { Button, Container, Form, Image } from "react-bootstrap";
-import { connect } from "react-redux";
-
-import Email from "../images/Email.svg";
-import key from "../images/key.svg";
-import person from "../images/person.svg";
-import { register } from "../redux/actions/authAction";
-
-// import { Redirect } from "react-router-dom";
-
-class ValidatedRegisterForm extends Component {
-  state = {
-    fullname: "",
-    email: "",
-    password: "",
-  };
-
-  render() {
-    return (
-      <Formik
-        initialValues={{ firstName: "", email: "", password: "" }}
-        onSubmit={(values, { setSubmitting }) => {
-          setTimeout(() => {
-            alert("Submission Successfull");
-
-            console.log("Signingup", values);
-            setSubmitting(false);
-          }, 500);
-          //   return <Redirect to="/Login" />
-        }}
-        //********Handling validation messages yourself*******/
-        // validate={values => {
-        //   let errors = {};
-        //   if (!values.email) {
-        //     errors.email = "Required";
-        //   } else if (!EmailValidator.validate(values.email)) {
-        //     errors.email = "Invalid email address";
-        //   }
-
-        //   const passwordRegex = /(?=.*[0-9])/;
-        //   if (!values.password) {
-        //     errors.password = "Required";
-        //   } else if (values.password.length < 8) {
-        //     errors.password = "Password must be 8 characters long.";
-        //   } else if (!passwordRegex.test(values.password)) {
-        //     errors.password = "Invalida password. Must contain one number";
-        //   }
-
-        //   return errors;
-        // }}
-        //********Using Yup for validation********/
-
-        validationSchema={Yup.object().shape({
-          firstName: Yup.string()
-            .min(3, "Too Short!")
-            .max(50, "Too Long!")
-            .required("Required"),
-          email: Yup.string().email().required("Email is Required"),
-          password: Yup.string()
-            .required("No password provided.")
-            .min(8, "Password is too short - should be 8 chars minimum.")
-            .matches(/(?=.*[0-9])/, "Password must contain a number."),
-        })}
-      >
-        {(props) => {
-          const {
-            values,
-            touched,
-            errors,
-            isSubmitting,
-            handleChange,
-            handleBlur,
-            handleSubmit,
-          } = props;
-          return (
-            <Container
-              fluid
-              className="d-flex justify-content-center mt-5 w-100 "
-            >
-              <Form
-                className=" text-center  mt-5 w-75 d-flex flex-column align-items-center  "
-                onSubmit={handleSubmit}
-              >
-                <h1>
-                  {" "}
-                  <b>Sign Up</b>{" "}
-                </h1>
-                <Form.Group
-                  controlId="formBasicName"
-                  className="d-inline-flex w-50 mt-4 "
-                >
-                  <label className="align-bottom mr-2" htmlFor="email">
-                    <Image src={person} alt="Person-icon" className="mt-2" />
-                  </label>
-                  <Form.Control
-                    name="firstName"
-                    type="text"
-                    placeholder="Enter your Name"
-                    value={values.firstName}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    className={errors.firstName && touched.firstName && "error"}
-                  />
-                  {errors.firstName && touched.firstName && (
-                    <div className="input-feedback  ml-2  ">
-                      {errors.firstName}
-                    </div>
-                  )}
-
-                  {errors.lastName && touched.lastName && (
-                    <div className="input-feedback  ml-2">
-                      {errors.lastName}
-                    </div>
-                  )}
-                </Form.Group>
-                <Form.Group
-                  controlId="formBasicEmail"
-                  className="d-inline-flex w-50 mt-4 "
-                >
-                  <label className="align-bottom mr-2" htmlFor="email">
-                    {" "}
-                    <Image src={Email} alt="Email-icon" className="mt-1" />
-                  </label>
-                  <Form.Control
-                    name="email"
-                    type="text"
-                    placeholder="Enter your email"
-                    value={values.email}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    className={errors.email && touched.email && "error"}
-                  />
-                  {errors.email && touched.email && (
-                    <div className="input-feedback ml-2 ">{errors.email}</div>
-                  )}
-                </Form.Group>
-
-                <Form.Group
-                  controlId="formBasicpassword"
-                  className="d-inline-flex w-50 mt-4 "
-                >
-                  <label className="align-bottom mr-2" htmlFor="email">
-                    {" "}
-                    <Image src={key} alt="key-icon" className="mt-1" />{" "}
-                  </label>
-                  <Form.Control
-                    name="password"
-                    type="password"
-                    placeholder="Enter your password"
-                    value={values.password}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    className={errors.password && touched.password && "error"}
-                  />
-                  {errors.password && touched.password && (
-                    <div className="input-feedback  ml-2">
-                      {errors.password}
-                    </div>
-                  )}
-                </Form.Group>
-                <Button
-                  className="w-25 mt-4 mb-5 "
-                  variant="primary "
-                  type="submit"
-                  disabled={isSubmitting}
-                >
-                  Sign Up
-                </Button>
-              </Form>
-            </Container>
-          );
-        }}
-      </Formik>
-    );
-  }
+import React, { useState , useEffect} from "react";
+import { Link } from "react-router-dom";
+import { signInWithGoogle, auth, generateUserDocument } from "../firebase";
+import {connect} from 'react-redux'
+import {setUser} from '../redux/actions/authAction'
+import Avatar from '@material-ui/core/Avatar';
+import Button from '@material-ui/core/Button';
+import CssBaseline from '@material-ui/core/CssBaseline';
+import TextField from '@material-ui/core/TextField';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Checkbox from '@material-ui/core/Checkbox';
+import MaterialLink from '@material-ui/core/Link';
+import Grid from '@material-ui/core/Grid';
+import Box from '@material-ui/core/Box';
+import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
+import Typography from '@material-ui/core/Typography';
+import { makeStyles } from '@material-ui/core/styles';
+import Container from '@material-ui/core/Container';
+function Copyright() {
+  return (
+    <Typography variant="body2" color="textSecondary" align="center">
+      {'Copyright © '}
+      <Link color="inherit" href="https://material-ui.com/">
+        Your Website
+      </Link>{' '}
+      {new Date().getFullYear()}
+      {'.'}
+    </Typography>
+  );
 }
-const mapDispatchToProps = (dispatch) => {
-  return {
-    register: (userDetails) => dispatch(register(userDetails)),
+
+
+const useStyles = makeStyles((theme) => ({
+  paper: {
+    marginTop: theme.spacing(8),
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+  },
+  avatar: {
+    margin: theme.spacing(1),
+    backgroundColor: theme.palette.secondary.main,
+  },
+  form: {
+    width: '100%', // Fix IE 11 issue.
+    marginTop: theme.spacing(3),
+  },
+  submit: {
+    margin: theme.spacing(3, 0, 2),
+  },
+}));
+
+
+const Register = (props) => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [displayName, setDisplayName] = useState("");
+  const [error, setError] = useState(null);
+  const classes = useStyles();
+
+  useEffect(() => {
+    auth.onAuthStateChanged(async (userAuth) => {
+      const user = await generateUserDocument(userAuth);
+      console.log("user register", user);
+      props.setUser(user);
+    });
+  }, []);
+
+  const createUserWithEmailAndPasswordHandler = async (
+    event,
+    email,
+    password
+  ) => {
+    event.preventDefault();
+    try {
+      const { user } = await auth.createUserWithEmailAndPassword(
+        email,
+        password
+      );
+      generateUserDocument(user, { displayName });
+    } catch (error) {
+      setError("Error Signing up with email and password");
+    }
+
+    setEmail("");
+    setPassword("");
+    setDisplayName("");
   };
+  const onChangeHandler = (event) => {
+    const { name, value } = event.currentTarget;
+    if (name === "userEmail") {
+      setEmail(value);
+    } else if (name === "userPassword") {
+      setPassword(value);
+    } else if (name === "displayName") {
+      setDisplayName(value);
+    }
+  };
+  return (
+    <Container component="main" maxWidth="xs">
+    <CssBaseline />
+    <div className={classes.paper}>
+      <Avatar className={classes.avatar}>
+        <LockOutlinedIcon />
+      </Avatar>
+      <Typography component="h1" variant="h5">
+        Sign up
+      </Typography>
+      <form className={classes.form} noValidate>
+        <Grid container spacing={2}>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              autoComplete="fname"
+              name="displayName"
+              value={displayName}
+              placeholder="E.g: Faruq"
+              onChange={(event) => onChangeHandler(event)}
+              variant="outlined"
+              required
+              fullWidth
+              id="firstName"
+              label="Display Name"
+              autoFocus
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              variant="outlined"
+              required
+              fullWidth
+              id="lastName"
+              label="Last Name"
+              name="lastName"
+              autoComplete="lname"
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <TextField
+              variant="outlined"
+              required
+              fullWidth
+              name="userEmail"
+              value={email}
+              placeholder="E.g: faruq123@gmail.com"
+              onChange={(event) => onChangeHandler(event)}
+              id="email"
+              label="Email Address"
+              autoComplete="email"
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <TextField
+              variant="outlined"
+              required
+              fullWidth
+              label="Password"
+              type="password"
+              name="userPassword"
+              value={password}
+              placeholder="Your Password"
+              id="userPassword"
+              onChange={(event) => onChangeHandler(event)}
+                autoComplete="current-password"
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <FormControlLabel
+              control={<Checkbox value="allowExtraEmails" color="primary" />}
+              label="I want to receive inspiration, marketing promotions and updates via email."
+            />
+          </Grid>
+        </Grid>
+        <Button
+          type="submit"
+          fullWidth
+          variant="contained"
+          color="primary"
+          className={classes.submit}
+          onClick={(event) => {
+            createUserWithEmailAndPasswordHandler(event, email, password);
+          }}
+
+        >
+          Sign Up
+        </Button>
+        <div
+          onClick={() => signInWithGoogle()}
+          className="bg-red-500 hover:bg-red-600 w-full py-2 text-white"
+        >
+          <img alt="" className="img-fluid" src={require("../assets/google_signup_button.png")} />
+        </div>
+        
+        <Grid container justify="flex-end">
+          <Grid item>
+            <Link to="/login" variant="body2">
+              Already have an account? Sign in
+            </Link>
+          </Grid>
+        </Grid>
+      </form>
+    </div>
+    <Box mt={5}>
+      <Copyright />
+    </Box>
+  </Container>
+
+
+/*
+    <div className="mt-8">
+      <h1 className="text-3xl mb-2 text-center font-bold">Sign Up</h1>
+      <div className="border border-blue-400 mx-auto w-11/12 md:w-2/4 rounded py-8 px-4 md:px-8">
+        {error !== null && (
+          <div className="py-4 bg-red-600 w-full text-white text-center mb-3">
+            {error}
+          </div>
+        )}
+        <form className="">
+          <label htmlFor="displayName" className="block">
+            Display Name:
+          </label>
+          <input
+            type="text"
+            className="my-1 p-1 w-full "
+            name="displayName"
+            value={displayName}
+            placeholder="E.g: Faruq"
+            id="displayName"
+            onChange={(event) => onChangeHandler(event)}
+          />
+          <label htmlFor="userEmail" className="block">
+            Email:
+          </label>
+          <input
+            type="email"
+            className="my-1 p-1 w-full"
+            name="userEmail"
+            value={email}
+            placeholder="E.g: faruq123@gmail.com"
+            id="userEmail"
+            onChange={(event) => onChangeHandler(event)}
+          />
+          <label htmlFor="userPassword" className="block">
+            Password:
+          </label>
+          <input
+            type="password"
+            className="mt-1 mb-3 p-1 w-full"
+            name="userPassword"
+            value={password}
+            placeholder="Your Password"
+            id="userPassword"
+            onChange={(event) => onChangeHandler(event)}
+          />
+          <button
+            className="bg-green-400 hover:bg-green-500 w-full py-2 text-white"
+            onClick={(event) => {
+              createUserWithEmailAndPasswordHandler(event, email, password);
+            }}
+          >
+            Sign up
+          </button>
+        </form>
+        <p className="text-center my-3">or</p>
+        <button
+          onClick={() => signInWithGoogle()}
+          className="bg-red-500 hover:bg-red-600 w-full py-2 text-white"
+        >
+          Sign In with Google
+        </button>
+        <p className="text-center my-3">
+          Already have an account?{" "}
+          <Link to="/login" className="text-blue-500 hover:text-blue-600">
+            Sign in here
+          </Link>
+        </p>
+      </div>
+          </div> */
+);
 };
 
-export default connect(null, mapDispatchToProps)(ValidatedRegisterForm);
+const mapStateToProps = storeState => {
+  return {
+    user: storeState.authState.user
+  }
+}
+export default connect(mapStateToProps, {setUser})(Register);

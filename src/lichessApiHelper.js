@@ -1,5 +1,6 @@
 import { user1, user2, token1, token2 } from "./config";
 import axios from "axios";
+
 export const testMove = (gameId, start, end, currentPlayer) => {
   console.log("current Player: ", currentPlayer);
   const move = start + end;

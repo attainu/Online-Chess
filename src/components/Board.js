@@ -2,21 +2,25 @@ import React, { Component } from "react";
 import Square from "./Square";
 import { Row } from "react-bootstrap";
 import piecePositions from "../constants/piecePositions";
-import { user1, user2, token1, token2 } from "../config";
 import { columns, rows, getPiece, flipColor, getUIC } from "../boardHelper";
 import {
   createChallenge,
   getGameState,
   getGameBoardState,
-  saveCurrentPlayer
+  saveCurrentPlayer,
+  updatePiecePositions,
 } from "../redux/actions/chessActions";
 import { connect } from "react-redux";
+import { withRouter } from "react-router-dom";
+import {
+  fetchGameFromLocalStorage,
+  storeGameInLocalStorage,
+} from "../boardHelper";
 
 import { testMove } from "../lichessApiHelper";
 
 class Board extends Component {
   state = {
-    piecePositions: [...piecePositions],
     start: null,
     end: null,
     numClicks: 0,
@@ -25,10 +29,22 @@ class Board extends Component {
 
   componentDidMount() {
     //create a challenge
-
+    console.log("props gameId", this.props.match.params.gameId);
+    //check if current game id exists in local storage
+    // if yes then update board accordingly
+    // else load default piece positions
+    const gameExists = fetchGameFromLocalStorage(
+      this.props.match.params.gameId
+    );
+    if (gameExists) {
+      this.props.updatePiecePositions(gameExists);
+    } else {
+      this.props.updatePiecePositions(piecePositions);
+      storeGameInLocalStorage(this.props.match.params.gameId, piecePositions);
+    }
     this.setState((prevState) => ({
       ...prevState,
-      gameId: this.props.gameId,
+      gameId: this.props.match.params.gameId,
     }));
   }
 
@@ -38,7 +54,7 @@ class Board extends Component {
         ...prevState,
         numClicks: prevState.numClicks + 1,
         start: id,
-        activePiece: this.state.piecePositions[rows.indexOf(id.charAt(1))][
+        activePiece: this.props.piecePositions[rows.indexOf(id.charAt(1))][
           columns.indexOf(id.charAt(0))
         ].piece,
       }));
@@ -69,33 +85,53 @@ class Board extends Component {
       const endRow = end.charAt(1);
       //check if valid move -> if true then move
       console.log("running test move");
-      testMove(this.state.gameId, start, end, this.props.currentPlayer)
+      testMove(
+        this.props.match.params.gameId,
+        start,
+        end,
+        this.props.currentPlayer
+      )
         .then((res) => {
           console.log("currentPlayer", this.props.currentPlayer);
-          console.log("moving", startRow, startCol);
+          //console.log("moving", startRow, startCol);
 
-          const updated = this.state.piecePositions.map((row, i) => {
-            //console.log(rows[i], startRow)
-            if (rows[i] === startRow) {
-              const updatedRow = row.map((col, j) => {
-                if (columns[j] === startCol) {
-                  console.log("removing", startRow, startCol);
-                  //remove
-                  return { ...col, piece: null };
-                }
-                return col;
-              });
-              return updatedRow;
-            } else if (rows[i] === endRow) {
-              const updatedRow = row.map((col, j) => {
-                if (columns[j] === endCol) {
-                  console.log("placing", endRow, endCol);
-                  //put the piece
-                  return { ...col, piece: this.state.activePiece };
-                }
-                return col;
-              });
-              return updatedRow;
+          const updated = this.props.piecePositions.map((row, i) => {
+            console.log(rows[i], startRow, endRow);
+            if (rows[i] === startRow || rows[i] === endRow) {
+              if (rows[i] === startRow && rows[i] === endRow) {
+                const updatedRow = row.map((col, j) => {
+                  if (columns[j] === startCol) {
+                    console.log("removing", startRow, startCol);
+                    //remove
+                    return { ...col, piece: null };
+                  } else if (columns[j] === endCol) {
+                    return { ...col, piece: this.state.activePiece };
+                  }
+                  return col;
+                });
+                return updatedRow;
+              } else if (rows[i] === startRow) {
+                const updatedRow = row.map((col, j) => {
+                  if (columns[j] === startCol) {
+                    console.log("removing", startRow, startCol);
+                    //remove
+                    return { ...col, piece: null };
+                  }
+                  return col;
+                });
+                return updatedRow;
+              } else if (rows[i] === endRow) {
+                console.log("matched endRow");
+                const updatedRow = row.map((col, j) => {
+                  if (columns[j] === endCol) {
+                    console.log("placing", endRow, endCol);
+                    //put the piece
+                    return { ...col, piece: this.state.activePiece };
+                  }
+                  return col;
+                });
+                return updatedRow;
+              }
             } else return row;
           });
           console.log("updated", updated);
@@ -105,13 +141,17 @@ class Board extends Component {
             start: null,
             end: null,
             numClicks: 0,
-            piecePositions: updated,
           }));
+          this.props.updatePiecePositions(updated);
+          storeGameInLocalStorage(this.props.match.params.gameId, updated);
 
-          this.props.getGameState(this.state.gameId);
+          this.props.getGameState(this.props.match.params.gameId);
           if (this.props.status) {
             alert(`Checkmate: winner ${this.props.winner}`);
           }
+          //play move sound
+          const moveSound = new Audio(require('../assets/sounds/Move.ogg'))
+          moveSound.play()
         })
         .catch((err) => {
           console.log("error", err);
@@ -135,36 +175,37 @@ class Board extends Component {
     return (
       <>
         <div>
-          {this.state.piecePositions.map((row, rowIndex) => {
-            startColor = flipColor(startColor);
-            return (
-              <Row key={rowIndex}>
-                {row.map((col, colIndex) => {
-                  color = colIndex === 0 ? startColor : flipColor(color);
-                  return (
-                    <Square
-                      isActive={
-                        this.state.start ===
-                        columns[colIndex] + "" + rows[rowIndex]
-                      }
-                      handleClick={this.handleClick}
-                      key={colIndex}
-                      id={columns[colIndex] + "" + rows[rowIndex]}
-                      color={color}
-                      piece={getPiece(
-                        columns[colIndex] + "" + rows[rowIndex],
-                        this.state.piecePositions
-                      )}
-                    />
-                  );
-                })}
-              </Row>
-            );
-          })}
+          {this.props.piecePositions &&
+            this.props.piecePositions.map((row, rowIndex) => {
+              startColor = flipColor(startColor);
+              return (
+                <Row key={rowIndex}>
+                  {row.map((col, colIndex) => {
+                    color = colIndex === 0 ? startColor : flipColor(color);
+                    return (
+                      <Square
+                        isActive={
+                          this.state.start ===
+                          columns[colIndex] + "" + rows[rowIndex]
+                        }
+                        handleClick={this.handleClick}
+                        key={colIndex}
+                        id={columns[colIndex] + "" + rows[rowIndex]}
+                        color={color}
+                        piece={getPiece(
+                          columns[colIndex] + "" + rows[rowIndex],
+                          this.props.piecePositions
+                        )}
+                      />
+                    );
+                  })}
+                </Row>
+              );
+            })}
         </div>
         <button
           onClick={() => {
-            this.props.getGameBoardState(this.props.gameId);
+            this.props.getGameBoardState(this.props.match.params.gameId);
           }}
         >
           game state
@@ -180,6 +221,7 @@ const mapStateToProps = (storeState) => {
     gameId: storeState.chessState.gameId,
     winner: storeState.chessState.winner,
     status: storeState.chessState.status,
+    piecePositions: storeState.chessState.piecePositions,
   };
 };
 export default connect(mapStateToProps, {
@@ -187,4 +229,5 @@ export default connect(mapStateToProps, {
   getGameState,
   getGameBoardState,
   saveCurrentPlayer,
-})(Board);
+  updatePiecePositions,
+})(withRouter(Board));
