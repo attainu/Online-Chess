@@ -6,6 +6,7 @@ import {
   checkIfChallengeAccepted,
 } from "./chessActions";
 import { saveUser, saveGameId } from "./saveActions";
+import { saveUserLocally, saveGameIdLocally } from "./localStorageActions";
 
 const proxyurl = "https://cors-anywhere.herokuapp.com/";
 
@@ -42,6 +43,7 @@ export const acceptChallenge = (gameId) => async (dispatch) => {
     .then((res) => {
       console.log("accepted");
       dispatch(saveUser(user2));
+      saveUserLocally(user2);
       dispatch(streamBoardGameState(gameId));
     })
     .catch((err) => console.log(err));
@@ -73,7 +75,9 @@ export const createChallenge = () => async (dispatch) => {
     })
     .then((res) => {
       dispatch(saveGameId(res.data.challenge.id));
+      saveGameIdLocally(res.data.challenge.id);
       dispatch(saveUser(user1));
+      saveUserLocally(user1);
       //check if challenge is accepted for 2 mins
       dispatch(checkIfChallengeAccepted(res.data.challenge.id));
     })

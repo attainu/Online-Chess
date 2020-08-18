@@ -12,13 +12,18 @@ import {
 import {
   saveCurrentPlayer,
   resetPiecesCaptureByWhiteAndBlack,
+  updatePiecePositions,
 } from "../redux/actions/saveActions";
+
+import {
+  saveCurrentPlayerLocally,
+  resetPiecesCaptureByWhiteAndBlackLocally,
+} from "../redux/actions/localStorageActions";
 import {
   getGameState,
   getGameBoardState,
   streamBoardGameState,
   streamIncomingEvents,
-  updatePiecePositions,
   exportAllStudyChapters,
   checkIfPlayerHasMoved,
 } from "../redux/actions/chessActions";
@@ -41,7 +46,7 @@ function Board(props) {
     props.getGameBoardState(gameId);
     props.updatePiecePositions(piecePositions);
     console.log("calling get game board state, setting black and white");
-  }, []);
+  }, [gameId, props]);
 
   useEffect(() => {
     console.log("calling stream event", props);
@@ -54,6 +59,7 @@ function Board(props) {
 
       //make pieces captured by black and white as empty array
       props.resetPiecesCaptureByWhiteAndBlack();
+      resetPiecesCaptureByWhiteAndBlackLocally();
 
       moves.forEach((move) => {
         console.log("move", move);
@@ -73,7 +79,7 @@ function Board(props) {
 
       props.updatePiecePositions(updated);
     }
-  }, [props.gameBoardState, gameId]);
+  }, [props.gameBoardState, gameId, props]);
 
   const handleClick = (id, piece) => {
     if (numClicks === 0) {
@@ -88,7 +94,7 @@ function Board(props) {
       setNumClicks(numClicks + 1);
       setEnd(id);
 
-      console.log("current player set here", props.currentPlayer)
+      console.log("current player set here", props.currentPlayer);
       if (props.currentPlayer && props.white && props.black && props.user) {
         if (
           props.currentPlayer === 1 &&
@@ -144,6 +150,7 @@ function Board(props) {
           );
 
           props.saveCurrentPlayer(props.currentPlayer === 1 ? 2 : 1);
+          saveCurrentPlayerLocally(props.currentPlayer === 1 ? 2 : 1);
           setStart(null);
           setEnd(null);
           setNumClicks(0);
