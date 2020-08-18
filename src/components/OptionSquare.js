@@ -1,18 +1,17 @@
 import React, { Component } from "react";
 import Piece from "./Piece";
-class Square extends Component {
+
+class OptionSquare extends Component {
   render() {
-    const { id, piece, color, isActive, handleClick } = this.props;
+    const { piece, color, isActive } = this.props;
     return (
       <div
         className="d-flex justify-content-center align-items-center"
-        onClick={() => {
-          handleClick(id, piece);
-        }}
+       
         style={{
           width: 60,
           height: 60,
-          backgroundColor: isActive ? "yellow" : color,
+          backgroundColor: isActive ? "red" : color,
         }}
       >
         {this.props.piece && <Piece piece={piece} />}
@@ -21,4 +20,4 @@ class Square extends Component {
   }
 }
 
-export default Square;
+export default OptionSquare;

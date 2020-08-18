@@ -1,15 +1,14 @@
-import { user2, token1, token2 } from "./config";
+import { user1, user2, token1, token2 } from "../config";
 import axios from "axios";
 
-export const testMove = (gameId, start, end, currentPlayer) => {
-  console.log("current Player: ", currentPlayer);
+export const testMove = (gameId, start, end, user) => {
   const move = start + end;
   return axios.post(
     `https://lichess.org/api/board/game/${gameId}/move/${move}`,
     "",
     {
       headers: {
-        Authorization: `Bearer ${currentPlayer === 1 ? token1 : token2}`,
+        Authorization: `Bearer ${user === user1 ? token1 : token2}`,
       },
     }
   );

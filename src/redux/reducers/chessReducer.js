@@ -1,15 +1,63 @@
-import { user1 } from "../../config";
-
 const initialState = {
   status: null,
   gameId: null,
   currentPlayer: 1,
   piecePositions: null,
+  gameBoardState: null,
+  challenger: null,
+  receiver: null,
+  black: null,
+  white: null,
+  user: null,
+  piecesCapturedByBlack: [],
+  piecesCapturedByWhite: [],
 };
 
 const chessReducer = (state = initialState, action) => {
   const { type, payload } = action;
   switch (type) {
+    case "RESET_PIECES_CAPTURED":
+      return {
+        ...state,
+        piecesCapturedByBlack: [],
+        piecesCapturedByWhite: [],
+      };
+    case "ADD_PIECE_CAPTURED_BY_BLACK":
+      return {
+        ...state,
+        piecesCapturedByBlack: [...state.piecesCapturedByBlack, payload],
+      };
+    case "ADD_PIECE_CAPTURED_BY_WHITE":
+      return {
+        ...state,
+        piecesCapturedByWhite: [...state.piecesCapturedByWhite, payload],
+      };
+    case "SAVE_WHITE_AND_BLACK":
+      return {
+        ...state,
+        white: payload.white,
+        black: payload.black,
+      };
+    case "SAVE_USER":
+      return {
+        ...state,
+        user: payload,
+      };
+    case "SAVE_CHALLENGER":
+      return {
+        ...state,
+        challenger: payload,
+      };
+    case "SAVE_RECEIVER":
+      return {
+        ...state,
+        receiver: payload,
+      };
+    case "SAVE_GAME_BOARD_STATE":
+      return {
+        ...state,
+        gameBoardState: payload,
+      };
     case "SAVE_CURRENT_PLAYER":
       return {
         ...state,

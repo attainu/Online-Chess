@@ -1,15 +1,31 @@
 import React, { Component } from "react";
-import {
-  Button,
-  Jumbotron,
-  Container,
-  Table,
-  Col,
-  Row,
-  Card,
-} from "react-bootstrap";
+import { Button, Jumbotron, Container, Table, Col, Row } from "react-bootstrap";
+import CreateGame from "../components/CreateGame";
 
 class HomePage extends Component {
+  state = {
+    show: false,
+  };
+  handleClose = () => {
+    this.setState((prevState) => ({
+      ...prevState,
+      show: false,
+    }));
+  };
+  handleShow = () => {
+    this.setState((prevState) => ({
+      prevState,
+      show: true,
+    }));
+  };
+
+  handleClick = () => {
+    console.log("clicked");
+    this.setState((prevState) => ({
+      ...prevState,
+      show: true,
+    }));
+  };
   render() {
     return (
       <div className="App pb-5" id="jumbotron">
@@ -26,10 +42,10 @@ class HomePage extends Component {
                   is thought to have scrambled parts of Cicero's De Finibus
                   Bonorum et Malorum for use in a type specimen book.
                 </p>
-                <Button>Play Now</Button>
+                <Button onClick={this.handleClick}>Play Now</Button>
               </Col>
               <Col lg={1} />
-              <Col lg={5} >
+              <Col lg={5}>
                 <img
                   src={require("../assets/chessanimated.gif")}
                   style={{ height: 450, width: 450 }}
@@ -128,6 +144,7 @@ class HomePage extends Component {
             </Table>
           </Row>
         </Container>
+        <CreateGame show={this.state.show} />
       </div>
     );
   }

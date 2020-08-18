@@ -9,7 +9,6 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
-import MaterialLink from '@material-ui/core/Link';
 import Grid from '@material-ui/core/Grid';
 import Box from '@material-ui/core/Box';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
@@ -55,7 +54,7 @@ const Register = (props) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
-  const [error, setError] = useState(null);
+  const [setError] = useState(null);
   const classes = useStyles();
 
   useEffect(() => {
@@ -64,7 +63,7 @@ const Register = (props) => {
       console.log("user register", user);
       props.setUser(user);
     });
-  }, []);
+  }, [props]);
 
   const createUserWithEmailAndPasswordHandler = async (
     event,

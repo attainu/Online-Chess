@@ -8,26 +8,25 @@ import {
   getPiece,
   flipColor,
   movePieceOnBoard,
-} from "../helpers/boardHelper";
+} from "../boardHelper";
 import {
-  saveCurrentPlayer,
-  resetPiecesCaptureByWhiteAndBlack,
-} from "../redux/actions/saveActions";
-import {
+  createChallenge,
   getGameState,
   getGameBoardState,
+  saveCurrentPlayer,
   streamBoardGameState,
   streamIncomingEvents,
   updatePiecePositions,
   exportAllStudyChapters,
   checkIfPlayerHasMoved,
+  createOpenChallenge,
+  acceptChallenge,
 } from "../redux/actions/chessActions";
 import { connect } from "react-redux";
 import { useParams } from "react-router-dom";
-import { testMove } from "../helpers/lichessApiHelper";
-import WinnerModal from "./WinnerModal";
+import { testMove } from "../lichessApiHelper";
 
-function Board(props) {
+function Board1(props) {
   const { gameId } = useParams();
   const [start, setStart] = useState(null);
   const [end, setEnd] = useState(null);
@@ -36,8 +35,13 @@ function Board(props) {
 
   useEffect(() => {
     console.log("calling stream event", gameId);
-    props.streamIncomingEvents();
-
+    //props.exportAllStudyChapters()
+    //props.streamIncomingEvents()
+    //props.acceptChallenge(gameId)
+    //create a challenge
+    //check if current game id exists in local storage
+    // if yes then update board accordingly
+    // else load default piece positions
     props.getGameBoardState(gameId);
     props.updatePiecePositions(piecePositions);
     console.log("calling get game board state, setting black and white");
@@ -51,10 +55,6 @@ function Board(props) {
       console.log("fetched game board state", props.gameBoardState);
       const moves = props.gameBoardState.split(" ");
       let updated = piecePositions;
-
-      //make pieces captured by black and white as empty array
-      props.resetPiecesCaptureByWhiteAndBlack();
-
       moves.forEach((move) => {
         console.log("move", move);
         const startCol = move.charAt(0);
@@ -70,7 +70,6 @@ function Board(props) {
           null
         );
       });
-
       props.updatePiecePositions(updated);
     }
   }, [props.gameBoardState, gameId]);
@@ -88,25 +87,16 @@ function Board(props) {
       setNumClicks(numClicks + 1);
       setEnd(id);
 
-      console.log("current player set here", props.currentPlayer)
-      if (props.currentPlayer && props.white && props.black && props.user) {
-        if (
-          props.currentPlayer === 1 &&
-          props.user.toLowerCase() === props.white.toLowerCase()
-        ) {
-          movePiece(start, id);
-        } else if (
-          props.currentPlayer === 2 &&
-          props.user.toLowerCase() === props.black.toLowerCase()
-        ) {
-          movePiece(start, id);
-        } else {
-          alert("wait for your turn");
-          setActivePiece(null);
-          setStart(null);
-          setEnd(null);
-          setNumClicks(0);
-        }
+      if (
+        props.currentPlayer === 1 &&
+        props.user.toLowerCase() === props.white
+      ) {
+        movePiece(start, id);
+      } else if (
+        props.currentPlayer === 2 &&
+        props.user.toLowerCase() === props.black
+      ) {
+        movePiece(start, id);
       } else {
         alert("wait for your turn");
         setActivePiece(null);
@@ -130,7 +120,7 @@ function Board(props) {
       const startRow = start.charAt(1);
       const endRow = end.charAt(1);
       //check if valid move -> if true then move
-      testMove(gameId, start, end, props.user)
+      testMove(gameId, start, end, props.currentPlayer)
         .then((res) => {
           //console.log("moving", startRow, startCol);
 
@@ -176,7 +166,6 @@ function Board(props) {
 
   return (
     <>
-      <WinnerModal show={props.winner} />
       {props.piecePositions &&
         props.piecePositions.map((row, rowIndex) => {
           startColor = flipColor(startColor);
@@ -235,13 +224,15 @@ const mapStateToProps = (storeState) => {
   };
 };
 export default connect(mapStateToProps, {
+  createChallenge,
   getGameState,
   getGameBoardState,
   saveCurrentPlayer,
   updatePiecePositions,
   streamIncomingEvents,
+  acceptChallenge,
   streamBoardGameState,
   exportAllStudyChapters,
+  createOpenChallenge,
   checkIfPlayerHasMoved,
-  resetPiecesCaptureByWhiteAndBlack,
-})(Board);
+})(Board1);

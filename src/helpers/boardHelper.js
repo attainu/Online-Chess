@@ -1,4 +1,11 @@
-import pieces from "./constants/pieces";
+import pieces from "../constants/pieces";
+import store from "../redux/reducers/store";
+import {
+  addPieceCapturedByBlack,
+  addPieceCapturedByWhite,
+} from "../redux/actions/saveActions";
+
+const { dispatch } = store;
 
 export const columns = ["a", "b", "c", "d", "e", "f", "g", "h"];
 export const rows = ["8", "7", "6", "5", "4", "3", "2", "1"];
@@ -12,7 +19,6 @@ export const fetchGameFromLocalStorage = (gameId) => {
     return null;
   }
 };
-
 
 export const movePiece = (
   startRow,
@@ -49,6 +55,23 @@ export const movePiece = (
             //remove
             return { ...col, piece: null };
           } else if (columns[j] === endCol) {
+            console.log("placing");
+            //check if any piece is captured
+            //if yes then store it in redux
+            const pieceCaptured =
+              piecePositions[rows.indexOf(endRow)][columns.indexOf(endCol)]
+                .piece;
+            console.log("piece captured", pieceCaptured);
+            if (pieceCaptured) {
+              //store it in redux
+              if (pieceCaptured.length === 2) {
+                dispatch(addPieceCapturedByBlack(pieceCaptured));
+                console.log("calling piece Captured BY black");
+              } else {
+                dispatch(addPieceCapturedByWhite(pieceCaptured));
+                console.log("calling piece Captured BY white");
+              }
+            }
             return { ...col, piece: activePiece };
           }
           return col;
@@ -70,6 +93,22 @@ export const movePiece = (
           if (columns[j] === endCol) {
             console.log("placing", endRow, endCol);
             //put the piece
+            //check if any piece is captured
+            //if yes then store it in redux
+            const pieceCaptured =
+              piecePositions[rows.indexOf(endRow)][columns.indexOf(endCol)]
+                .piece;
+            console.log("piece captured", pieceCaptured);
+            if (pieceCaptured) {
+              //store it in redux
+              if (pieceCaptured.length === 2) {
+                dispatch(addPieceCapturedByBlack(pieceCaptured));
+                console.log("calling piece Captured BY black");
+              } else {
+                dispatch(addPieceCapturedByWhite(pieceCaptured));
+                console.log("calling piece Captured BY white");
+              }
+            }
             return { ...col, piece: activePiece };
           }
           return col;
@@ -241,6 +280,37 @@ export const flipColor = (color) => {
     return "#F8C89A";
   } else {
     return "#CB8745";
+  }
+};
+
+export const getPieceImage = (piece) => {
+  switch (piece) {
+    case "R":
+      return pieces.rook;
+    case "N":
+      return pieces.knight;
+    case "K":
+      return pieces.king;
+    case "Q":
+      return pieces.queen;
+    case "P":
+      return pieces.pawn;
+    case "B":
+      return pieces.bishop;
+    case "WR":
+      return pieces.whiteRook;
+    case "WN":
+      return pieces.whiteKnight;
+    case "WK":
+      return pieces.whiteKing;
+    case "WQ":
+      return pieces.whiteQueen;
+    case "WP":
+      return pieces.whitePawn;
+    case "WB":
+      return pieces.whiteBishop;
+    default:
+      return null;
   }
 };
 

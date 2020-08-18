@@ -1,50 +1,48 @@
-import { user1, user2, token1, token2 } from "../../config";
+import { token1, token2 } from "../../config";
 import axios from "axios";
-import piecePositions from "../../constants/piecePositions";
+import store from "../reducers/store";
+import {
+  saveGameBoardState,
+  saveGameStatus,
+  saveCurrentPlayer,
+  saveWinner,
+  saveWhiteAndBlack,
+} from "./saveActions";
+//sec-fetch-site: same-origin
 
-export const resignGame = (gameId, currentPlayer) => async (dispatch) => {
+export const checkIfPlayerHasMoved = (gameId) => async (dispatch) => {
+  //check every 10 seconds
+  const myInterval = setInterval(async () => {
+    await dispatch(streamBoardGameState(gameId));
+    const status = store.getState().chessState.status;
+    const gameBoardState = store.getState().chessState.gameBoardState;
+    const numMoves = gameBoardState ? gameBoardState.split(" ").length : 0;
+    if (numMoves % 2 === 0) {
+      //next turn is white
+      dispatch(saveCurrentPlayer(1));
+    } else {
+      //next turn is black
+      dispatch(saveCurrentPlayer(2));
+    }
+    if (status !== "started") {
+      clearInterval(myInterval);
+    }
+  }, 10000);
+};
+
+export const streamIncomingEvents = () => async (dispatch) => {
   axios
-    .post(`https://lichess.org/api/board/game/${gameId}/resign`, {
+    .get(`https://lichess.org/api/stream/event`, {
       headers: {
         Authorization: `Bearer ${token2}`,
       },
     })
     .then((res) => {
-      console.log(res);
-      console.log("user " + currentPlayer + " resigned");
-      dispatch(getGameState(gameId));
+      console.log("incoming event", res);
     })
-    .catch((err) => console.log(err));
+    .catch((err) => console.log("stream incoming" + err));
 };
 
-export const streamIncomingEvents = (token) => async (dispatch) => {
-  axios
-    .get("https://lichess.org/api/stream/event", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
-    .then((res) => console.log(res.data))
-    .catch((err) => console.log(err));
-};
-
-export const acceptChallenge = (gameId, token) => async (dispatch) => {
-  axios
-    .post(`https://lichess.org/api/challenge/${gameId}/accept`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
-    .then((res) => console.log(res))
-    .catch((err) => console.log(err));
-};
-
-export const saveCurrentPlayer = (player) => {
-  return {
-    type: "SAVE_CURRENT_PLAYER",
-    payload: player,
-  };
-};
 
 export const updatePiecePositions = (piecePositions) => {
   return {
@@ -53,87 +51,58 @@ export const updatePiecePositions = (piecePositions) => {
   };
 };
 
-export const getGameBoardState = (gameId) => async (dispatch) => {
+export const exportAllStudyChapters = () => async (dispatch) => {
+  const studyId = "36cRQa9R";
+  axios
+    .get(`https://lichess.org/study/${studyId}.pgn`)
+    .then((res) => {
+      console.log("study", res);
+    })
+    .catch((err) => console.log("study", err));
+};
+
+export const streamBoardGameState = (gameId) => async (dispatch) => {
   axios
     .get(`https://lichess.org/api/board/game/stream/${gameId}`, {
       headers: {
-        Authorization: `Bearer ${token1}`,
+        Authorization: `Bearer ${token2}`,
       },
     })
     .then((res) => {
-      console.log(res.data);
-      if (res.data.white.id !== "techacademy") {
-        dispatch(saveCurrentPlayer(2));
+      if (res.data.state) {
+        dispatch(saveGameStatus(res.data.state.status));
+        dispatch(saveGameBoardState(res.data.state.moves));
       }
     })
     .catch((err) => console.log(err));
 };
 
-export const offerDraw = (gameId, playerOffering) => {};
-
-export const handleDrawOffer = (gameId, playerReceiving, accept) => async (
-  dispatch
-) => {
-  //accept has to be yes or no
+export const getGameBoardState = (gameId) => async (dispatch) => {
   axios
-    .post(`https://lichess.org/api/board/game/${gameId}/draw/${accept}`, {
-      headers: {
-        Authorization: `Bearer ${playerReceiving === 1 ? token1 : token2}`,
-      },
-    })
-    .then((res) => {
-      console.log(res);
-      dispatch(getGameState(gameId));
-    })
-    .catch((err) => console.log(err));
-};
-
-export const abortGame = (gameId, currentPlayer) => async (dispatch) => {
-  axios
-    .post(`https://cors-anywhere.herokuapp.com/https://lichess.org/api/board/game/${gameId}/abort`, {
+    .get(`https://lichess.org/api/board/game/stream/${gameId}`, {
       headers: {
         Authorization: `Bearer ${token2}`,
-
       },
     })
     .then((res) => {
-      console.log(res);
-      console.log("user " + currentPlayer + " aborted");
-      dispatch(getGameState(gameId));
+      dispatch(saveWhiteAndBlack(res.data.white.id, res.data.black.id));
     })
-    .catch((err) => console.log(err));
+    .catch((err) => console.log("game board state", err));
 };
 
-export const createChallenge = (clockLimit, color) => async (dispatch) => {
-  const data = {
-    rated: false,
-    clock: {
-      limit: clockLimit * 60,
-      increment: 0,
-    },
-    color: color.toLowerCase(),
-    variant: "standard",
-    acceptByToken: token2,
-  };
-  console.log("data sending", data);
-  axios
-    .post(`https://lichess.org/api/challenge/${user2}`, JSON.stringify(data), {
-      headers: {
-        Authorization: `Bearer ${token1}`,
-      },
-    })
-    .then((res) => {
-      console.log("res", res);
-      dispatch(saveGameId(res.data.challenge.id));
-    })
-    .catch((err) => console.log(err));
-};
-
-export const saveGameId = (gameId) => {
-  return {
-    type: "SAVE_GAME_ID",
-    payload: gameId,
-  };
+export const checkIfChallengeAccepted = (gameId) => async (dispatch) => {
+  let time = 0;
+  const myInteval = setInterval(() => {
+    dispatch(streamBoardGameState(gameId));
+    if (store.getState().chessState.status === "started") {
+      clearInterval(myInteval);
+    }
+    time++;
+    if (time === 120) {
+      clearInterval(myInteval);
+    }
+  }, 10000);
+  console.log("interval cleared");
 };
 
 export const getGameState = (gameId) => async (dispatch) => {
@@ -144,27 +113,13 @@ export const getGameState = (gameId) => async (dispatch) => {
       },
     })
     .then((res) => {
-      console.log("res", res.data);
-
       if (res.data.state && res.data.state.status === "mate") {
         dispatch(saveGameStatus(res.data.state.status));
         dispatch(saveWinner(res.data.state.winner));
-        alert(`Checkmate, winner ${res.data.state.winner}`);
+      } else if (res.data.state && res.data.state.status) {
+        dispatch(saveGameStatus(res.data.state.status));
+        dispatch(saveWinner(res.data.state.winner));
       }
     })
     .catch((err) => console.log(err));
-};
-
-export const saveWinner = (winner) => {
-  return {
-    type: "SAVE_WINNER",
-    payload: winner,
-  };
-};
-
-export const saveGameStatus = (status) => {
-  return {
-    type: "SAVE_GAME_STATUS",
-    payload: status,
-  };
 };

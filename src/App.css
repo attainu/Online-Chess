@@ -12,6 +12,17 @@
   width: 0;
   height: 0;
 }
+.counter.counter-lg {
+  top: -24px !important;
+}
+
+.dot {
+  height: 15px;
+  width: 15px;
+  background-color: red;
+  border-radius: 50%;
+  display: inline-block;
+}
 
 /* The slider */
 .slider {

@@ -55,7 +55,7 @@ const Login = (props) => {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState(null);
+  const [setError] = useState(null);
 
   const signInWithEmailAndPasswordHandler = (event, email, password) => {
     event.preventDefault();
@@ -71,7 +71,7 @@ const Login = (props) => {
       console.log("user login", user);
       props.setUser(user);
     });
-  }, []);
+  }, [props]);
 
   const onChangeHandler = (event) => {
     const { name, value } = event.currentTarget;
@@ -119,7 +119,6 @@ const Login = (props) => {
             onChange={(event) => onChangeHandler(event)}
             label="Password"
             type="password"
-            id="password"
             autoComplete="current-password"
           />
           <FormControlLabel

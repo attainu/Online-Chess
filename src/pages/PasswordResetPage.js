@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import {auth} from '../firebase'
+//import {auth} from '../firebase'
 
 const PasswordResetPage = () => {
   const [email, setEmail] = useState("");
-  const [emailHasBeenSent, setEmailHasBeenSent] = useState(false);
-  const [error, setError] = useState(null);
+  const [emailHasBeenSent] = useState(false);
+  const [error] = useState(null);
   const onChangeHandler = (event) => {
     const { name, value } = event.currentTarget;
     if (name === "userEmail") {
@@ -13,6 +13,7 @@ const PasswordResetPage = () => {
     }
   };
 
+  /*
   const sendResetEmail = (event) => {
     event.preventDefault();
     auth
@@ -27,6 +28,7 @@ const PasswordResetPage = () => {
         setError("Error resetting password");
       });
   };
+  */
 
   return (
     <div className="mt-8">
