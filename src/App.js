@@ -6,7 +6,7 @@ import "./App.css";
 
 import HomePage from "./pages/HomePage";
 import Header from "./components/Header";
-import Footer from "./components/Footer";
+import Footer from "./components/Footer"
 import GamePage from "./pages/GamePage";
 import AcceptChallengePage from "./pages/AcceptChallengePage";
 
