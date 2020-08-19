@@ -2,8 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Modal, Button } from "react-bootstrap";
 import { connect } from "react-redux";
 import { Redirect } from "react-router-dom";
-import pieces from "../constants/pieces";
-import { getPieceImage } from "../helpers/boardHelper";
+
 
 function WinnerModal(props) {
   const [close, setClose] = useState(false);
