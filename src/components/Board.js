@@ -2,6 +2,9 @@ import React, { useState, useEffect } from "react";
 import Square from "./Square";
 import { Row } from "react-bootstrap";
 import piecePositions from "../constants/piecePositions";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 import {
   columns,
   rows,
@@ -12,18 +15,13 @@ import {
 import {
   saveCurrentPlayer,
   resetPiecesCaptureByWhiteAndBlack,
-  updatePiecePositions,
 } from "../redux/actions/saveActions";
-
-import {
-  saveCurrentPlayerLocally,
-  resetPiecesCaptureByWhiteAndBlackLocally,
-} from "../redux/actions/localStorageActions";
 import {
   getGameState,
   getGameBoardState,
   streamBoardGameState,
   streamIncomingEvents,
+  updatePiecePositions,
   exportAllStudyChapters,
   checkIfPlayerHasMoved,
 } from "../redux/actions/chessActions";
@@ -35,31 +33,35 @@ import WinnerModal from "./WinnerModal";
 function Board(props) {
   const { gameId } = useParams();
   const [start, setStart] = useState(null);
-  const [end, setEnd] = useState(null);
   const [numClicks, setNumClicks] = useState(0);
   const [activePiece, setActivePiece] = useState(null);
 
+  const notify = () => toast("Wait for your turn!");
+  const {
+    getGameBoardState,
+    gameBoardState,
+    updatePiecePositions,
+    resetPiecesCaptureByWhiteAndBlack,
+    checkIfPlayerHasMoved,
+  } = props;
   useEffect(() => {
-    console.log("calling stream event", gameId);
-    props.streamIncomingEvents();
-
-    props.getGameBoardState(gameId);
-    props.updatePiecePositions(piecePositions);
+    //console.log("calling stream event", gameId);
+    //props.streamIncomingEvents();
+    getGameBoardState(gameId);
+    updatePiecePositions(piecePositions);
     console.log("calling get game board state, setting black and white");
-  }, [gameId, props]);
+  }, [getGameBoardState, updatePiecePositions, gameId]);
 
   useEffect(() => {
-    console.log("calling stream event", props);
-    props.checkIfPlayerHasMoved(gameId);
+    checkIfPlayerHasMoved(gameId);
     //props.streamBoardGameState(gameId);
-    if (props.gameBoardState) {
-      console.log("fetched game board state", props.gameBoardState);
-      const moves = props.gameBoardState.split(" ");
+    if (gameBoardState) {
+      console.log("fetched game board state", gameBoardState);
+      const moves = gameBoardState.split(" ");
       let updated = piecePositions;
 
       //make pieces captured by black and white as empty array
-      props.resetPiecesCaptureByWhiteAndBlack();
-      resetPiecesCaptureByWhiteAndBlackLocally();
+      resetPiecesCaptureByWhiteAndBlack();
 
       moves.forEach((move) => {
         console.log("move", move);
@@ -77,9 +79,15 @@ function Board(props) {
         );
       });
 
-      props.updatePiecePositions(updated);
+      updatePiecePositions(updated);
     }
-  }, [props.gameBoardState, gameId, props]);
+  }, [
+    gameBoardState,
+    updatePiecePositions,
+    checkIfPlayerHasMoved,
+    resetPiecesCaptureByWhiteAndBlack,
+    gameId,
+  ]);
 
   const handleClick = (id, piece) => {
     if (numClicks === 0) {
@@ -92,7 +100,6 @@ function Board(props) {
       );
     } else if (numClicks === 1) {
       setNumClicks(numClicks + 1);
-      setEnd(id);
 
       console.log("current player set here", props.currentPlayer);
       if (props.currentPlayer && props.white && props.black && props.user) {
@@ -107,17 +114,15 @@ function Board(props) {
         ) {
           movePiece(start, id);
         } else {
-          alert("wait for your turn");
+          notify();
           setActivePiece(null);
           setStart(null);
-          setEnd(null);
           setNumClicks(0);
         }
       } else {
-        alert("wait for your turn");
+        notify();
         setActivePiece(null);
         setStart(null);
-        setEnd(null);
         setNumClicks(0);
       }
     }
@@ -127,7 +132,6 @@ function Board(props) {
     console.log("start", start, end);
     if (start === end && start !== null) {
       setStart(null);
-      setEnd(null);
       setActivePiece(null);
       setNumClicks(0);
     } else {
@@ -150,9 +154,7 @@ function Board(props) {
           );
 
           props.saveCurrentPlayer(props.currentPlayer === 1 ? 2 : 1);
-          saveCurrentPlayerLocally(props.currentPlayer === 1 ? 2 : 1);
           setStart(null);
-          setEnd(null);
           setNumClicks(0);
 
           props.updatePiecePositions(updated);
@@ -170,7 +172,6 @@ function Board(props) {
           console.log("error", err);
           console.log("Invalid move");
           setStart(null);
-          setEnd(null);
           setActivePiece(null);
           setNumClicks(0);
         });
@@ -183,7 +184,8 @@ function Board(props) {
 
   return (
     <>
-      <WinnerModal show={props.winner} />
+      <ToastContainer />
+      <WinnerModal />
       {props.piecePositions &&
         props.piecePositions.map((row, rowIndex) => {
           startColor = flipColor(startColor);

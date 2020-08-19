@@ -16,11 +16,6 @@ const initialState = {
 const chessReducer = (state = initialState, action) => {
   const { type, payload } = action;
   switch (type) {
-    case "SAVE_PIECES_CAPTURED":
-      return {
-        piecesCapturedByBlack: payload.black,
-        piecesCapturedByWhite: payload.white,
-      };
     case "RESET_PIECES_CAPTURED":
       return {
         ...state,

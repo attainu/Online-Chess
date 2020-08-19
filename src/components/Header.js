@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Nav, Navbar } from "react-bootstrap";
+import { Navbar } from "react-bootstrap";
 import { Link } from "react-router-dom";
 
 class Header extends Component {
@@ -26,18 +26,6 @@ class Header extends Component {
           </Link>
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
-        <Navbar.Collapse id="basic-navbar-nav">
-          <Nav className="mr-auto">
-            <Nav.Link style={{ fontWeight: "bold" }}>Play</Nav.Link>
-            <Nav.Link style={{ fontWeight: "bold" }} href="#link">
-              Learn
-            </Nav.Link>
-          </Nav>
-          <div className="notification">
-            <i className="fas fa-bell"></i>
-            <span className="counter counter-lg">1</span>&nbsp;&nbsp;
-          </div>
-        </Navbar.Collapse>
       </Navbar>
     );
   }

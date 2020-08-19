@@ -5,23 +5,9 @@ export const saveUser = (user) => {
   };
 };
 
-export const updatePiecePositions = (piecePositions) => {
-  return {
-    type: "UPDATE_PIECE_POSITIONS",
-    payload: piecePositions,
-  };
-};
-
 export const resetPiecesCaptureByWhiteAndBlack = () => {
   return {
     type: "RESET_PIECES_CAPTURED"
-  }
-}
-
-export const savePiecesCaptured = (piecesCapturedByWhite, piecesCapturedByBlack) => {
-  return {
-    type: "SAVE_PIECES_CAPTURED",
-    payload: {white: piecesCapturedByWhite, black: piecesCapturedByBlack}
   }
 }
 

@@ -1,4 +1,5 @@
 import pieces from "../constants/pieces";
+import smallPieces from "../constants/smallPieces";
 import store from "../redux/reducers/store";
 import {
   addPieceCapturedByBlack,
@@ -19,6 +20,320 @@ export const fetchGameFromLocalStorage = (gameId) => {
     return null;
   }
 };
+/*
+const isPawnCheck = (row, col, piecePositions, activePiece) => {
+  let checkPiece;
+
+  //pawn
+  //check if king is there
+  const checkRow = activePiece === "WP" ? row + 1 : row - 1;
+  let checkCol = col - 1;
+  if (checkRow >= 0 && checkRow < 8 && checkCol >= 0 && checkCol < 8) {
+    checkPiece = piecePositions[checkRow][checkCol].piece;
+    if (
+      (checkPiece === "K" && activePiece === "WP") ||
+      (checkPiece === "WK" && activePiece === "P")
+    ) {
+      return columns[checkCol] + "" + rows[checkRow];
+    }
+  } else {
+    checkCol = col + 1;
+    if (checkRow >= 0 && checkRow < 8 && checkCol >= 0 && checkCol < 8) {
+      checkPiece = piecePositions[checkRow][checkCol].piece;
+      if (
+        (checkPiece === "K" && activePiece === "WP") ||
+        (checkPiece === "WK" && activePiece === "P")
+      ) {
+        return columns[checkCol] + "" + rows[checkRow];
+      } else return false;
+    }
+  }
+  return false;
+};
+
+const isKnightCheck = (row, col, piecePositions, activePiece) => {
+  let checkPiece;
+
+  let checkRow, checkCol;
+  let flag = false;
+  // +2 col +1 row -1 row
+  if (col + 2 < 8) {
+    checkCol = col + 2;
+    if (row + 1 < 8) {
+      checkRow = row + 1;
+      flag = true;
+    } else if (row - 1 >= 0) {
+      checkRow = row - 1;
+      flag = true;
+    }
+  }
+  // -2 col +1 row -1 row
+  else if (col - 2 >= 0) {
+    checkCol = col - 2;
+    if (row + 1 < 8) {
+      checkRow = row + 1;
+      flag = true;
+    } else if (row - 1 >= 0) {
+      checkRow = row - 1;
+      flag = true;
+    }
+  }
+  // +2 row +1 col -1 col
+  else if (row + 2 < 8) {
+    checkRow = row + 2;
+    if (col + 1 < 8) {
+      checkCol = col + 1;
+      flag = true;
+    } else if (col - 1 >= 0) {
+      checkCol = col - 1;
+      flag = true;
+    }
+  }
+  // -2 row +1 col -1 col
+  else if (row - 2 < 8) {
+    checkRow = row - 2;
+    if (col + 1 < 8) {
+      checkCol = col + 1;
+      flag = true;
+    } else if (col - 1 >= 0) {
+      checkCol = col - 1;
+      flag = true;
+    }
+  } else return false;
+  if (flag) {
+    checkPiece = piecePositions[checkRow][checkCol].piece;
+    if (
+      (checkPiece === "K" && activePiece === "WN") ||
+      (checkPiece === "WK" && activePiece === "N")
+    ) {
+      return columns[checkCol] + "" + rows[checkRow];
+    }
+  } else return false;
+};
+
+const isRookCheck = (row, col, piecePositions, activePiece) => {
+  //up down left right
+  let checkPiece;
+
+  let kingRow, kingCol;
+  let kingFound = false;
+  for (let i = 0; i < row; i++) {
+    checkPiece = piecePositions[i][col].piece;
+    if (kingFound) {
+      if (checkPiece) return false;
+    } else if (
+      (checkPiece === "K" && (activePiece === "WR" || activePiece === "WQ")) ||
+      (checkPiece === "WK" && (activePiece === "R" || activePiece === "Q"))
+    ) {
+      kingRow = i;
+      kingCol = col;
+      kingFound = true;
+    }
+  }
+  if (kingFound) {
+    return columns[kingCol] + "" + rows[kingRow];
+  }
+
+  for (let i = row; i < 8; i++) {
+    checkPiece = piecePositions[i][col].piece;
+    if (kingFound) {
+      if (checkPiece) return false;
+    } else if (
+      (checkPiece === "K" && (activePiece === "WR" || activePiece === "WQ")) ||
+      (checkPiece === "WK" && (activePiece === "R" || activePiece === "Q"))
+    ) {
+      kingRow = i;
+      kingCol = col;
+      kingFound = true;
+    }
+  }
+  if (kingFound) {
+    return columns[kingCol] + "" + rows[kingRow];
+  }
+
+  for (let i = 0; i < col; i++) {
+    checkPiece = piecePositions[row][i].piece;
+    if (kingFound) {
+      if (checkPiece) return false;
+    } else if (
+      (checkPiece === "K" && (activePiece === "WR" || activePiece === "WQ")) ||
+      (checkPiece === "WK" && (activePiece === "R" || activePiece === "Q"))
+    ) {
+      kingRow = row;
+      kingCol = i;
+      kingFound = true;
+    }
+  }
+  if (kingFound) {
+    return columns[kingCol] + "" + rows[kingRow];
+  }
+
+  for (let i = col; i < 8; i++) {
+    checkPiece = piecePositions[row][i].piece;
+    if (kingFound) {
+      if (checkPiece) return false;
+    } else if (
+      (checkPiece === "K" && (activePiece === "WR" || activePiece === "WQ")) ||
+      (checkPiece === "WK" && (activePiece === "R" || activePiece === "Q"))
+    ) {
+      kingRow = row;
+      kingCol = i;
+      kingFound = true;
+    }
+  }
+  if (kingFound) {
+    return columns[kingCol] + "" + rows[kingRow];
+  }
+
+  return false;
+};
+
+const isBishopCheck = (row, col, piecePositions, activePiece) => {
+  let checkPiece;
+
+  let kingRow, kingCol;
+  let kingFound = false;
+
+  let i = row;
+  let j = col;
+  //row - col -
+  while (i - 1 >= 0 && j - 1 >= 0) {
+    checkPiece = piecePositions[i][j].piece;
+    if (checkPiece === "K" && (activePiece === "WQ" || activePiece === "B")) {
+      kingRow = i;
+      kingCol = j;
+      kingFound = true;
+      break;
+    } else if (
+      checkPiece === "K" &&
+      (activePiece === "WQ" || activePiece === "B")
+    ) {
+      kingRow = i;
+      kingCol = j;
+      kingFound = true;
+      break;
+    } else if (checkPiece !== null) {
+      break;
+    }
+    row--;
+    col--;
+  }
+  //row + col +
+  while (i + 1 < 8 && j + 1 < 8) {
+    checkPiece = piecePositions[i][j].piece;
+    if (checkPiece === "K" && (activePiece === "WQ" || activePiece === "B")) {
+      kingRow = i;
+      kingCol = j;
+      kingFound = true;
+      break;
+    } else if (
+      checkPiece === "K" &&
+      (activePiece === "WQ" || activePiece === "B")
+    ) {
+      kingRow = i;
+      kingCol = j;
+      kingFound = true;
+      break;
+    } else if (checkPiece !== null) {
+      break;
+    }
+    row++;
+    col++;
+  }
+  //row + col -
+  while (i + 1 < 8 && j - 1 >= 0) {
+    checkPiece = piecePositions[i][j].piece;
+    if (checkPiece === "K" && (activePiece === "WQ" || activePiece === "B")) {
+      kingRow = i;
+      kingCol = j;
+      kingFound = true;
+      break;
+    } else if (
+      checkPiece === "K" &&
+      (activePiece === "WQ" || activePiece === "B")
+    ) {
+      kingRow = i;
+      kingCol = j;
+      kingFound = true;
+      break;
+    } else if (checkPiece !== null) {
+      break;
+    }
+    row++;
+    col--;
+  }
+  //row - col +
+  while (i - 1 >= 0 && j + 1 < 8) {
+    checkPiece = piecePositions[i][j].piece;
+    if (checkPiece === "K" && (activePiece === "WQ" || activePiece === "B")) {
+      kingRow = i;
+      kingCol = j;
+      kingFound = true;
+      break;
+    } else if (
+      checkPiece === "K" &&
+      (activePiece === "WQ" || activePiece === "B")
+    ) {
+      kingRow = i;
+      kingCol = j;
+      kingFound = true;
+      break;
+    } else if (checkPiece !== null) {
+      break;
+    }
+    row--;
+    col++;
+  }
+  if (kingFound) {
+    return columns[kingCol] + "" + rows[kingRow];
+  }
+  return false;
+};
+
+
+export const detectIfCheck = (endRow, endCol, piecePositions, activePiece) => {
+  let row = rows.indexOf(endRow);
+  let col = columns.indexOf(endCol);
+  //pawn, bishop, rook, knight, queen
+  if (activePiece === "WP" || activePiece === "P") {
+    const pawn = isPawnCheck(row, col, piecePositions, activePiece);
+    console.log("checked by pawn", pawn);
+    if (pawn) return pawn;
+  }
+  //check if knight is active
+  else if (activePiece === "WN" || activePiece === "N") {
+    const knight = isKnightCheck(row, col, piecePositions, activePiece);
+    console.log("checked by knight", knight);
+    if (knight) {
+      return knight;
+    }
+  }
+  //check if rook is active
+  else if (
+    activePiece === "WR" ||
+    activePiece === "R" ||
+    activePiece === "WQ" ||
+    activePiece === "Q"
+  ) {
+    const rook = isRookCheck(row, col, piecePositions, activePiece);
+    console.log("checked by rook or queen", rook);
+    if (rook) return rook;
+  }
+  //check if bishop
+ /* else if (
+    activePiece === "WB" ||
+    activePiece === "B" ||
+    activePiece === "WQ" ||
+    activePiece === "Q"
+  ) {
+    const bishop = isBishopCheck(row, col, piecePositions, activePiece);
+    console.log("checked by bishop or queen", bishop);
+    if (bishop) return bishop;
+  }
+  
+  return false;
+};
+*/
 
 export const movePiece = (
   startRow,
@@ -264,8 +579,6 @@ export const checkIfPawnPromotion = (
   } else return false;
 };
 
-export const checkIfEnPassant = () => {};
-
 export const storeGameInLocalStorage = (gameId, piecePositions) => {
   localStorage.setItem("gameId", gameId);
   localStorage.setItem("piecePositions", JSON.stringify(piecePositions));
@@ -286,29 +599,29 @@ export const flipColor = (color) => {
 export const getPieceImage = (piece) => {
   switch (piece) {
     case "R":
-      return pieces.rook;
+      return smallPieces.rook;
     case "N":
-      return pieces.knight;
+      return smallPieces.knight;
     case "K":
-      return pieces.king;
+      return smallPieces.king;
     case "Q":
-      return pieces.queen;
+      return smallPieces.queen;
     case "P":
-      return pieces.pawn;
+      return smallPieces.pawn;
     case "B":
-      return pieces.bishop;
+      return smallPieces.bishop;
     case "WR":
-      return pieces.whiteRook;
+      return smallPieces.whiteRook;
     case "WN":
-      return pieces.whiteKnight;
+      return smallPieces.whiteKnight;
     case "WK":
-      return pieces.whiteKing;
+      return smallPieces.whiteKing;
     case "WQ":
-      return pieces.whiteQueen;
+      return smallPieces.whiteQueen;
     case "WP":
-      return pieces.whitePawn;
+      return smallPieces.whitePawn;
     case "WB":
-      return pieces.whiteBishop;
+      return smallPieces.whiteBishop;
     default:
       return null;
   }

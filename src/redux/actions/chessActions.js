@@ -8,14 +8,6 @@ import {
   saveWinner,
   saveWhiteAndBlack,
 } from "./saveActions";
-import {
-  saveGameBoardStateLocally,
-  saveGameStatusLocally,
-  saveCurrentPlayerLocally,
-  saveWinnerLocally,
-  saveWhiteAndBlackLocally,
-  saveGameIdLocally,
-} from "./localStorageActions";
 //sec-fetch-site: same-origin
 
 export const checkIfPlayerHasMoved = (gameId) => async (dispatch) => {
@@ -28,11 +20,9 @@ export const checkIfPlayerHasMoved = (gameId) => async (dispatch) => {
     if (numMoves % 2 === 0) {
       //next turn is white
       dispatch(saveCurrentPlayer(1));
-      saveCurrentPlayerLocally(1);
     } else {
       //next turn is black
       dispatch(saveCurrentPlayer(2));
-      saveCurrentPlayerLocally(2);
     }
     if (status !== "started") {
       clearInterval(myInterval);
@@ -51,6 +41,13 @@ export const streamIncomingEvents = () => async (dispatch) => {
       console.log("incoming event", res);
     })
     .catch((err) => console.log("stream incoming" + err));
+};
+
+export const updatePiecePositions = (piecePositions) => {
+  return {
+    type: "UPDATE_PIECE_POSITIONS",
+    payload: piecePositions,
+  };
 };
 
 export const exportAllStudyChapters = () => async (dispatch) => {
@@ -73,9 +70,10 @@ export const streamBoardGameState = (gameId) => async (dispatch) => {
     .then((res) => {
       if (res.data.state) {
         dispatch(saveGameStatus(res.data.state.status));
-        saveGameIdLocally(res.data.state.status);
         dispatch(saveGameBoardState(res.data.state.moves));
-        saveGameBoardStateLocally(res.data.state.moves);
+        if(res.data.state.winner) {
+          dispatch(saveWinner(res.data.state.winner))
+        }
       }
     })
     .catch((err) => console.log(err));
@@ -90,7 +88,6 @@ export const getGameBoardState = (gameId) => async (dispatch) => {
     })
     .then((res) => {
       dispatch(saveWhiteAndBlack(res.data.white.id, res.data.black.id));
-      saveWhiteAndBlackLocally(res.data.white.id, res.data.black.id);
     })
     .catch((err) => console.log("game board state", err));
 };
@@ -103,7 +100,7 @@ export const checkIfChallengeAccepted = (gameId) => async (dispatch) => {
       clearInterval(myInteval);
     }
     time++;
-    if (time === 120) {
+    if (time === 12) {
       clearInterval(myInteval);
     }
   }, 10000);
@@ -120,15 +117,19 @@ export const getGameState = (gameId) => async (dispatch) => {
     .then((res) => {
       if (res.data.state && res.data.state.status === "mate") {
         dispatch(saveGameStatus(res.data.state.status));
-        saveGameStatusLocally(res.data.state.status);
         dispatch(saveWinner(res.data.state.winner));
-        saveWinnerLocally(res.data.state.winner);
       } else if (res.data.state && res.data.state.status) {
         dispatch(saveGameStatus(res.data.state.status));
-        saveGameStatusLocally(res.data.state.status);
         dispatch(saveWinner(res.data.state.winner));
-        saveWinnerLocally(res.data.state.winner);
       }
     })
+    .catch((err) => console.log(err));
+};
+
+export const getAllStudyChapters = () => {
+  const studyId = "A4EBp7Ds";
+  axios
+    .get(`https://lichess.org/study/${studyId}.pgn`)
+    .then((res) => console.log(res))
     .catch((err) => console.log(err));
 };

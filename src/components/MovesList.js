@@ -1,29 +1,22 @@
 import React from "react";
 import { Row, Table, Col } from "react-bootstrap";
 import { connect } from "react-redux";
-import { getPieceImage } from "../helpers/boardHelper";
-import Piece from "./Piece";
+import PiecesList from "./PiecesList";
 
 function MovesList(props) {
   return (
     <Row>
       <Col>
-        <h5>Opponent</h5>
         <Row>
           {props.user &&
             props.white &&
-            (props.user.toLowerCase() !== props.white.toLowerCase()
-              ? props.piecesCapturedByWhite.map((piece, id) => (
-                  <div className="col-auto">
-                    <Piece piece={getPieceImage(piece)} />
-                  </div>
-                ))
-              : props.piecesCapturedByBlack.map((piece, id) => (
-                  <div className="col-auto">
-                    <Piece piece={getPieceImage(piece)} />
-                  </div>
-                )))}
+            (props.user.toLowerCase() !== props.white.toLowerCase() ? (
+              <PiecesList pieces={props.piecesCapturedByWhite} />
+            ) : (
+              <PiecesList pieces={props.piecesCapturedByBlack} />
+            ))}
         </Row>
+        <h5>Opponent</h5>
         <div
           className="my-1"
           style={{
@@ -57,17 +50,11 @@ function MovesList(props) {
         <Row>
           {props.user &&
             props.white &&
-            (props.user.toLowerCase() === props.white.toLowerCase()
-              ? props.piecesCapturedByWhite.map((piece, id) => (
-                  <div className="col-auto">
-                    <Piece piece={getPieceImage(piece)} />
-                  </div>
-                ))
-              : props.piecesCapturedByBlack.map((piece, id) => (
-                  <div className="col-auto">
-                    <Piece piece={getPieceImage(piece)} />
-                  </div>
-                )))}
+            (props.user.toLowerCase() === props.white.toLowerCase() ? (
+              <PiecesList pieces={props.piecesCapturedByWhite} />
+            ) : (
+              <PiecesList pieces={props.piecesCapturedByBlack} />
+            ))}
         </Row>
       </Col>
     </Row>

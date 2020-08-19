@@ -36,11 +36,17 @@ class HomePage extends Component {
                 <h1>Online Chess</h1>
                 <p>Play chess with your friends.</p>
                 <p>
-                  Lorem ipsum, or lipsum as it is sometimes known, is dummy text
-                  used in laying out print, graphic or web designs. The passage
-                  is attributed to an unknown typesetter in the 15th century who
-                  is thought to have scrambled parts of Cicero's De Finibus
-                  Bonorum et Malorum for use in a type specimen book.
+                  Chess is a two-player strategy board game played on a
+                  checkered board with 64 squares arranged in an 8×8 square
+                  grid. Played by millions of people worldwide, chess is
+                  believed to be derived from the Indian game chaturanga
+                  sometime before the 7th century. Chaturanga is also the likely
+                  ancestor of the East Asian strategy games xiangqi (Chinese
+                  chess), janggi (Korean chess), and shogi (Japanese chess).
+                  Chess reached Europe via Persia and Arabia by the 9th century,
+                  due to the Umayyad conquest of Hispania. The pieces assumed
+                  their current properties in Spain in the late 15th century,
+                  and the modern rules were standardized in the 19th century.
                 </p>
                 <Button onClick={this.handleClick}>Play Now</Button>
               </Col>
@@ -144,7 +150,7 @@ class HomePage extends Component {
             </Table>
           </Row>
         </Container>
-        <CreateGame show={this.state.show} />
+        <CreateGame show={this.state.show} handleClose={this.handleClose} />
       </div>
     );
   }

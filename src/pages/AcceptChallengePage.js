@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Spinner, Row } from "react-bootstrap";
+import { Spinner, Row ,Container} from "react-bootstrap";
 import { connect } from "react-redux";
 import {
   acceptChallenge,
@@ -8,19 +8,22 @@ import { useParams, Redirect } from "react-router-dom";
 
 function AcceptChallengePage(props) {
   const { gameId } = useParams();
+  const {status, acceptChallenge} = props
 
   useEffect(() => {
-    props.acceptChallenge(gameId);
-  }, []);
+    acceptChallenge(gameId);
+  }, [gameId, acceptChallenge]);
 
   console.log(gameId);
-  return props.status ? (
+  return status ? (
     <Redirect to={`/game/${gameId}`} />
   ) : (
-    <Row className="justify-content-center">
+    <Container fluid style={{height: "100%"}} id="jumbotron">
+    <Row className="justify-content-center py-5">
       <Spinner animation="border" role="status"></Spinner>
       <h3 style={{ color: "black" }}>Arranging pieces on board...</h3>
     </Row>
+    </Container>
   );
 }
 

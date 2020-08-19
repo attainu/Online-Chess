@@ -4,14 +4,17 @@ import { Container, Row } from "react-bootstrap";
 class Footer extends Component {
   render() {
     return (
-      <Container fluid style={{ backgroundColor: "#343A40" }}>
-        <Row className="justify-content-center p-2">
-          <img src="" alt="in"></img>
-          <img src="" alt="tw"></img>
-          <img src="" alt="fb"></img>
-        </Row>
-        <Row className="justify-content-center">
-          <p style={{ color: "white" }}>&copy; 2020 Online Chess</p>
+      <Container
+        fluid
+        style={{
+          marginBottom: -60,
+          backgroundColor: "#343A40",
+        }}
+      >
+        <Row className="justify-content-center py-4">
+          <p style={{ color: "white", margin: "auto" }}>
+            &copy; 2020 Online Chess
+          </p>
         </Row>
       </Container>
     );
