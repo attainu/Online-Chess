@@ -3,6 +3,7 @@ import { Modal, Button } from "react-bootstrap";
 import { connect } from "react-redux";
 import { Redirect } from "react-router-dom";
 
+
 function WinnerModal(props) {
   const [close, setClose] = useState(false);
   const [show, setShow] = useState(false);
@@ -35,14 +36,20 @@ function WinnerModal(props) {
       keyboard={false}
     >
       <Modal.Header closeButton>
-        <Modal.Title className="text-center">
-          {props.status === "mate" || props.status === "resign"
-            ? `${props.winner} wins`
+        <Modal.Title className="text-center d-flex justify-content-center">
+          {props.status === "mate"
+            ? `${
+                props.winner === "black" ? "Black" : "White"
+              } wins by checkmate`
+            : props.status === "resign"
+            ? `${props.winner === "black" ? "Black" : "White"} wins, ${
+                props.winner === "black" ? "White" : "Black"
+              } resigned`
             : props.status && props.status !== "started" && "It's a draw!"}
         </Modal.Title>
       </Modal.Header>
 
-      <Modal.Footer>
+      <Modal.Footer className="d-flex justify-content-center">
         <Button variant="secondary" onClick={handleClose}>
           Close
         </Button>

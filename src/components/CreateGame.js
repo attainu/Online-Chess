@@ -4,7 +4,7 @@ import { connect } from "react-redux";
 import { createChallenge } from "../redux/actions/userActions";
 import { Redirect } from "react-router-dom";
 
-const baseUrl = "https://guarded-bastion-85239.herokuapp.com";
+const baseUrl = "https://evening-earth-48202.herokuapp.com";
 
 function CreateGame(props) {
   const { createChallenge } = props;
@@ -19,11 +19,7 @@ function CreateGame(props) {
   return props.status === "started" ? (
     <Redirect to={`/game/${props.gameId}`} />
   ) : (
-    <Modal
-      show={props.show}
-      backdrop="static"
-      keyboard={false}
-    >
+    <Modal show={props.show} backdrop="static" keyboard={false}>
       <>
         {props.gameId && (
           <Modal.Header className="d-flex justify-content-center">
